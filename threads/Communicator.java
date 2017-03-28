@@ -15,12 +15,14 @@ public class Communicator {
      */
     private int message;
     private int numOfSpeaker, numOfListener;
+    private boolean messageWritten;
     private Lock conditionLock;
     private Condition speakerCondition, listenerCondition;
     public Communicator() {
     	this.message = 0;
     	this.numOfSpeaker = 0;
     	this.numOfListener = 0;
+	this.messageWritten = false;
     	this.conditionLock = new Lock();
     	this.speakerCondition = new Condition(this.conditionLock);
     	this.listenerCondition = new Condition(this.conditionLock);
@@ -38,14 +40,19 @@ public class Communicator {
      */
     public void speak(int word) {
 	conditionLock.acquire();
-	while (numOfListener == 0){
+	//System.out.println("conditionLock acquired by speaker");
+	while ((numOfListener == 0) || (messageWritten)){
 	    numOfSpeaker += 1;
+	    //System.out.println(numOfListener);
 	    speakerCondition.sleep();
 	}
+	//System.out.println(numOfListener);
 	message = word;
+	messageWritten = true;
 	numOfListener = 0;
 	listenerCondition.wakeAll();
 	conditionLock.release();
+	//System.out.println("conditionLock released by speaker");
     }
 
     /**
@@ -56,14 +63,19 @@ public class Communicator {
      */    
     public int listen() {
 	conditionLock.acquire();
-	while (numOfSpeaker == 0){
+	//System.out.println("conditionLock acquired by listener");
+	while ((numOfSpeaker == 0) && (messageWritten == false)){
 	    numOfListener += 1;
+	    //System.out.println("numOfListener += 1");
 	    listenerCondition.sleep();
+	    //System.out.println("listener wake up");
 	}
 	int word = message;
+	messageWritten = true;
 	numOfSpeaker = 0;
 	speakerCondition.wakeAll();
 	conditionLock.release();
+	//System.out.println("conditionLock released by listener");
 	return word;
     }
 }

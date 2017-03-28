@@ -403,6 +403,21 @@ public class KThread {
 	private int which;
     }
 
+    private static class CommunicateTest implements Runnable {
+	CommunicateTest(boolean flag, Communicator com) {
+	    this.flag = flag;
+	    this.com = com;
+	}
+
+	public void run() {
+	    if (flag) com.speak(100);
+	    else System.out.println(com.listen());
+	}
+
+	private boolean flag;
+	private Communicator com;
+    }
+
     /**
      * Tests whether this module is working.
      */
@@ -415,6 +430,15 @@ public class KThread {
 	KThread testKThread = new KThread(testThread);
 	testKThread.fork();
 	testKThread.join();
+	Communicator com = new Communicator();
+	new KThread(new CommunicateTest(true, com)).fork();
+	new KThread(new CommunicateTest(true, com)).fork();
+	new KThread(new CommunicateTest(false, com)).fork();
+	new KThread(new CommunicateTest(false, com)).fork();
+	new KThread(new CommunicateTest(true, com)).fork();
+	new KThread(new CommunicateTest(false, com)).fork();
+	new KThread(new CommunicateTest(true, com)).fork();
+	new CommunicateTest(false, com).run();
     }
 
     private static final char dbgThread = 't';
