@@ -43,9 +43,9 @@ public class Condition2 {
 
 	KThread.sleep();
 
-	Machine.interrupt().restore(intStatus);
-
 	conditionLock.acquire();
+
+	Machine.interrupt().restore(intStatus);
     }
 
     /**
