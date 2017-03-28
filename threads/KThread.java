@@ -404,18 +404,20 @@ public class KThread {
     }
 
     private static class CommunicateTest implements Runnable {
-	CommunicateTest(boolean flag, Communicator com) {
+	CommunicateTest(boolean flag, Communicator com, int word) {
 	    this.flag = flag;
 	    this.com = com;
+	    this.word = word;
 	}
 
 	public void run() {
-	    if (flag) com.speak(100);
+	    if (flag) com.speak(word);
 	    else System.out.println(com.listen());
 	}
 
 	private boolean flag;
 	private Communicator com;
+	private int word;
     }
 
     /**
@@ -431,14 +433,14 @@ public class KThread {
 	testKThread.fork();
 	testKThread.join();
 	Communicator com = new Communicator();
-	new KThread(new CommunicateTest(true, com)).fork();
-	new KThread(new CommunicateTest(true, com)).fork();
-	new KThread(new CommunicateTest(false, com)).fork();
-	new KThread(new CommunicateTest(false, com)).fork();
-	new KThread(new CommunicateTest(true, com)).fork();
-	new KThread(new CommunicateTest(false, com)).fork();
-	new KThread(new CommunicateTest(true, com)).fork();
-	new CommunicateTest(false, com).run();
+	new KThread(new CommunicateTest(false, com, 1)).fork();
+	new KThread(new CommunicateTest(true, com, 2)).fork();
+	new KThread(new CommunicateTest(true, com, 3)).fork();
+	new KThread(new CommunicateTest(false, com, 4)).fork();
+	new KThread(new CommunicateTest(true, com, 5)).fork();
+	new KThread(new CommunicateTest(false, com, 6)).fork();
+	new KThread(new CommunicateTest(true, com, 7)).fork();
+	new CommunicateTest(false, com, 8).run();
     }
 
     private static final char dbgThread = 't';
