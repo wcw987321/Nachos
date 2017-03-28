@@ -56,6 +56,7 @@ public class KThread {
 	    restoreState();
 
 	    createIdleThread();
+	    joinSem = new Semaphore(0);
 	}
     }
 
@@ -193,7 +194,9 @@ public class KThread {
 
 
 	currentThread.status = statusFinished;
-	
+
+	joinSem.V();
+
 	sleep();
     }
 
@@ -276,6 +279,10 @@ public class KThread {
 	Lib.debug(dbgThread, "Joining to thread: " + toString());
 
 	Lib.assertTrue(this != currentThread);
+
+	this.joinSem.P();
+
+	return;
 
     }
 
@@ -431,6 +438,7 @@ public class KThread {
     private String name = "(unnamed thread)";
     private Runnable target;
     private TCB tcb;
+    private Semaphore joinSem;
 
     /**
      * Unique identifer for this thread. Used to deterministically compare
