@@ -33,7 +33,17 @@ public class Condition2 {
     public void sleep() {
 	Lib.assertTrue(conditionLock.isHeldByCurrentThread());
 
+	boolean intStatus = Machine.interrupt().disable();
+
 	conditionLock.release();
+
+	KThread thread = KThread.currentThread();
+
+	waitQueue.waitForAccess(thread);
+
+	KThread.sleep();
+
+	Machine.interrupt().restore(intStatus);
 
 	conditionLock.acquire();
     }
@@ -44,6 +54,9 @@ public class Condition2 {
      */
     public void wake() {
 	Lib.assertTrue(conditionLock.isHeldByCurrentThread());
+
+	if ((conditionWaiter = waitQueue.nextThread()) != null)
+	    conditionWaiter.ready();
     }
 
     /**
@@ -52,7 +65,13 @@ public class Condition2 {
      */
     public void wakeAll() {
 	Lib.assertTrue(conditionLock.isHeldByCurrentThread());
+
+	while ((conditionWaiter = waitQueue.nextThread()) != null)
+	    conditionWaiter.ready();
     }
 
     private Lock conditionLock;
+    private KThread conditionWaiter = null;
+    private ThreadQueue waitQueue =
+	ThreadedKernel.scheduler.newThreadQueue(true); /** same as the waitqueue in Lock.java */
 }
