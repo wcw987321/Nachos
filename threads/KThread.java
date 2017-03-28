@@ -45,6 +45,7 @@ public class KThread {
     public KThread() {
 	if (currentThread != null) {
 	    tcb = new TCB();
+	joinSem = new Semaphore(0);
 	}	    
 	else {
 	    readyQueue = ThreadedKernel.scheduler.newThreadQueue(false);
@@ -195,7 +196,7 @@ public class KThread {
 
 	currentThread.status = statusFinished;
 
-	joinSem.V();
+	currentThread.joinSem.V();
 
 	sleep();
     }
@@ -412,6 +413,10 @@ public class KThread {
 	
 	new KThread(new PingTest(1)).setName("forked thread").fork();
 	new PingTest(0).run();
+	PingTest testThread = new PingTest(2);
+	KThread testKThread = new KThread(testThread);
+	testKThread.fork();
+	testKThread.join();
     }
 
     private static final char dbgThread = 't';
