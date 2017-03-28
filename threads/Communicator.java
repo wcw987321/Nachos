@@ -13,7 +13,17 @@ public class Communicator {
     /**
      * Allocate a new communicator.
      */
+    private int message;
+    private int numOfSpeaker, numOfListener;
+    private Lock conditionLock;
+    private Condition speakerCondition, listenerCondition;
     public Communicator() {
+    	this.message = 0;
+    	this.numOfSpeaker = 0;
+    	this.numOfListener = 0;
+    	this.conditionLock = new Lock();
+    	this.speakerCondition = new Condition(this.conditionLock);
+    	this.listenerCondition = new Condition(this.conditionLock);
     }
 
     /**
@@ -27,6 +37,15 @@ public class Communicator {
      * @param	word	the integer to transfer.
      */
     public void speak(int word) {
+	conditionLock.acquire();
+	while (numOfListener == 0){
+	    numOfSpeaker += 1;
+	    speakerCondition.sleep();
+	}
+	message = word;
+	numOfListener = 0;
+	listenerCondition.wakeAll();
+	conditionLock.release();
     }
 
     /**
@@ -36,6 +55,15 @@ public class Communicator {
      * @return	the integer transferred.
      */    
     public int listen() {
-	return 0;
+	conditionLock.acquire();
+	while (numOfSpeaker == 0){
+	    numOfListener += 1;
+	    listenerCondition.sleep();
+	}
+	int word = message;
+	numOfSpeaker = 0;
+	speakerCondition.wakeAll();
+	conditionLock.release();
+	return word;
     }
 }
