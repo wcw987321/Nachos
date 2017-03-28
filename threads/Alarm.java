@@ -76,8 +76,8 @@ public class Alarm {
 	    public int compare(Union u1, Union u2){
 		long wakeTime1 = u1.getWakeTime();
 		long wakeTime2 = u2.getWakeTime();
-		if (wakeTime1 > wakeTime2) {return 1;}
-		else if (wakeTime1 < wakeTime2) {return -1;}
+		if (wakeTime1 < wakeTime2) {return 1;}
+		else if (wakeTime1 > wakeTime2) {return -1;}
 		else {return 0;}
 	    }
 	};
