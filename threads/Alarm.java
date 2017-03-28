@@ -1,6 +1,9 @@
 package nachos.threads;
 
 import nachos.machine.*;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * Uses the hardware timer to provide preemption, and to allow threads to sleep
@@ -17,7 +20,7 @@ public class Alarm {
     public Alarm() {
 	Machine.timer().setInterruptHandler(new Runnable() {
 		public void run() { timerInterrupt(); }
-	    });
+	    });                                                                                                                                                                
     }
 
     /**
@@ -27,6 +30,13 @@ public class Alarm {
      * that should be run.
      */
     public void timerInterrupt() {
+
+	Union union;
+
+	if ((union = priorityQueue.poll()) != null){
+	    union.getThread().ready();
+	}
+
 	KThread.currentThread().yield();
     }
 
@@ -44,10 +54,56 @@ public class Alarm {
      *
      * @see	nachos.machine.Timer#getTime()
      */
+
+    /** add a priority queue to deal with the sorting */
+
+	class Union{
+	    KThread thread;
+	    long wakeTime;
+	    public Union(KThread thread, long wakeTime){
+		this.thread = thread;
+		this.wakeTime = wakeTime;
+	    }
+	    public long getWakeTime(){
+		return this.wakeTime;
+	    }
+	    public KThread getThread(){
+		return this.thread;
+	    }
+	}
+
+	Comparator<Union> OrderIsdn =  new Comparator<Union>(){
+	    public int compare(Union u1, Union u2){
+		long wakeTime1 = u1.getWakeTime();
+		long wakeTime2 = u2.getWakeTime();
+		if (wakeTime1 > wakeTime2) {return 1;}
+		else if (wakeTime1 < wakeTime2) {return -1;}
+		else {return 0;}
+	    }
+	};
+
+	Queue<Union> priorityQueue = new PriorityQueue<Union>(11, OrderIsdn);
+
+	
+
     public void waitUntil(long x) {
+
 	// for now, cheat just to get something working (busy waiting is bad)
 	long wakeTime = Machine.timer().getTime() + x;
-	while (wakeTime > Machine.timer().getTime())
-	    KThread.yield();
+	//while (wakeTime > Machine.timer().getTime())
+	//    KThread.yield();
+
+	boolean intStatus = Machine.interrupt().disable();
+
+	KThread thread = KThread.currentThread();
+
+	Union union = new Union(thread, wakeTime);
+
+	priorityQueue.add(union);
+
+	KThread.sleep();
+
+	Machine.interrupt().restore(intStatus);
+	
     }
 }
