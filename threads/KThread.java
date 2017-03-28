@@ -45,7 +45,6 @@ public class KThread {
     public KThread() {
 	if (currentThread != null) {
 	    tcb = new TCB();
-	joinSem = new Semaphore(0);
 	}	    
 	else {
 	    readyQueue = ThreadedKernel.scheduler.newThreadQueue(false);
@@ -57,7 +56,6 @@ public class KThread {
 	    restoreState();
 
 	    createIdleThread();
-	    joinSem = new Semaphore(0);
 	}
     }
 
@@ -443,7 +441,7 @@ public class KThread {
     private String name = "(unnamed thread)";
     private Runnable target;
     private TCB tcb;
-    private Semaphore joinSem;
+    private Semaphore joinSem= new Semaphore(0);
 
     /**
      * Unique identifer for this thread. Used to deterministically compare
