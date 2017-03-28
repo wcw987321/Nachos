@@ -420,10 +420,33 @@ public class KThread {
 	private int word;
     }
 
+    private static class AlarmTest implements Runnable {
+	AlarmTest(Alarm alarm, long time, int num) {
+	    this.alarm = alarm;
+	    this.time = time;
+	    this.num = num;
+	}
+
+	public void run()
+	{
+    		System.out.println(num + " previous time: " + Machine.timer().getTime());
+  		//ThreadedKernel.alarm.waitUntil(1000);
+		alarm.waitUntil(time);
+    		System.out.println(num + " posterior time: " + Machine.timer().getTime());
+    	}
+
+	private Alarm alarm;
+	private long time;
+	private int num;
+    }
+
     /**
      * Tests whether this module is working.
      */
     public static void selfTest() {
+
+	/** original test */
+
 	Lib.debug(dbgThread, "Enter KThread.selfTest");
 	
 	new KThread(new PingTest(1)).setName("forked thread").fork();
@@ -435,7 +458,7 @@ public class KThread {
 	testKThread.fork();
 	testKThread.join();
 
-	/**test of task III*/
+	/**test of task II*/
 
 	Lock lock = new Lock();
     	Condition2 condition2 = new Condition2(lock);
@@ -471,8 +494,43 @@ public class KThread {
     	new KThread(runnableA).fork();
     	new KThread(runnableB).fork();
 
+	/** test of task III */
+
+	Alarm alarm = new Alarm();
+	/*Runnable alarmTest = new Runnable()
+    	{
+    		public void run()
+    		{
+    			System.out.println("previous time: " + Machine.timer().getTime());
+    			//ThreadedKernel.alarm.waitUntil(1000);
+			alarm.waitUntil(1000);
+    			System.out.println("posterior time: " + Machine.timer().getTime());
+    		}
+    	};*/
+    	KThread k1 = new KThread(new AlarmTest(alarm, 5000, 1));
+    	KThread k2 = new KThread(new AlarmTest(alarm, 4000, 2));
+    	KThread k3 = new KThread(new AlarmTest(alarm, 3000, 3));
+    	KThread k4 = new KThread(new AlarmTest(alarm, 2000, 4));
+    	KThread k5 = new KThread(new AlarmTest(alarm, 1000, 5));
+	k1.fork();
+	k2.fork();
+	k3.fork();
+	k4.fork();
+	k5.fork();
+	k1.join();
+	k2.join();
+	k3.join();
+	k4.join();
+	k5.join();
+
 	/** test of task IV */
 	Communicator com = new Communicator();
+	new KThread(new CommunicateTest(false, com, 1)).fork();
+	new KThread(new CommunicateTest(true, com, 2)).fork();
+	new KThread(new CommunicateTest(true, com, 3)).fork();
+	new KThread(new CommunicateTest(false, com, 4)).fork();
+	new KThread(new CommunicateTest(true, com, 5)).fork();
+	new KThread(new CommunicateTest(false, com, 6)).fork();
 	new KThread(new CommunicateTest(false, com, 1)).fork();
 	new KThread(new CommunicateTest(true, com, 2)).fork();
 	new KThread(new CommunicateTest(true, com, 3)).fork();
