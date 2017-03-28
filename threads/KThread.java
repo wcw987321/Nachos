@@ -428,10 +428,50 @@ public class KThread {
 	
 	new KThread(new PingTest(1)).setName("forked thread").fork();
 	new PingTest(0).run();
+
+	/** test of task I */
 	PingTest testThread = new PingTest(2);
 	KThread testKThread = new KThread(testThread);
 	testKThread.fork();
 	testKThread.join();
+
+	/**test of task III*/
+
+	Lock lock = new Lock();
+    	Condition2 condition2 = new Condition2(lock);
+    	Runnable runnableA = new Runnable()
+    	{
+    		public void run()
+    		{
+    			lock.acquire();
+    			//KThread.currentThread().yield();
+    			condition2.wake();
+    			System.out.println("thread A begin");
+			System.out.println("A sleep");
+    			condition2.sleep();
+			System.out.println("A wake");
+    			lock.release();
+    			System.out.println("thread A end");
+    		}
+    	}, runnableB = new Runnable()
+    	{
+    		public void run()
+    		{
+    			lock.acquire();
+    			//KThread.currentThread().yield();
+    			condition2.wake();
+    			System.out.println("thread B begin");
+			System.out.println("B sleep");
+    			condition2.sleep();
+			System.out.println("B wake");
+    			lock.release();
+    			System.out.println("thread B end");
+    		}
+    	};
+    	new KThread(runnableA).fork();
+    	new KThread(runnableB).fork();
+
+	/** test of task IV */
 	Communicator com = new Communicator();
 	new KThread(new CommunicateTest(false, com, 1)).fork();
 	new KThread(new CommunicateTest(true, com, 2)).fork();
