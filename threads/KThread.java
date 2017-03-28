@@ -194,7 +194,7 @@ public class KThread {
 
 	currentThread.status = statusFinished;
 
-	currentThread.joinSem.V();
+	currentThread.joinSem.V(); /** tell others I have finished */
 
 	sleep();
     }
@@ -279,7 +279,7 @@ public class KThread {
 
 	Lib.assertTrue(this != currentThread);
 
-	this.joinSem.P();
+	this.joinSem.P(); /** waiting for the thread's finish without busy waiting */
 
 	return;
 
@@ -441,7 +441,7 @@ public class KThread {
     private String name = "(unnamed thread)";
     private Runnable target;
     private TCB tcb;
-    private Semaphore joinSem= new Semaphore(0);
+    private Semaphore joinSem= new Semaphore(0); /** A semaphore for join and its initialization*/
 
     /**
      * Unique identifer for this thread. Used to deterministically compare
