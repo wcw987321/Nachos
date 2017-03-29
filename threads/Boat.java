@@ -61,14 +61,17 @@ public class Boat
         t.setName("Sample Boat Thread");
         t.fork();*/
 
-    boatPosition = 0;
-    numOfChildrenOnMolokai = 0;
-    numOfAdultsOnOahu = 0;
-    numOfChildrenOnOahu = 0;
-    peopleOnBoat = 0;
-    m = 0;
+	/** initialization */
+	boatPosition = 0;
+	numOfChildrenOnMolokai = 0;
+	numOfAdultsOnOahu = 0;
+	numOfChildrenOnOahu = 0;
+	peopleOnBoat = 0;
+	m = 0;
 	
 	Communicator com = new Communicator();
+
+	/** definition of Adult and Child class*/
 	class Adult implements Runnable{
 	    private Communicator com;
 	    public Adult(Communicator com){
@@ -88,6 +91,8 @@ public class Boat
 		ChildItinerary(com);
 	    }
 	}
+
+	/** construct all adults and children threads*/
 
 	for (int i = 0; i < adults; i++){
 	    new KThread(new Adult(com)).fork();
@@ -109,7 +114,7 @@ public class Boat
 	    //alarm.waitUntil(1000);
 	    //System.out.println("m: " + m);
 	}*/
-
+	/** wait for the last person to respond */
 	s1.P();
 	//System.out.println("main function finished!");
     }
@@ -118,6 +123,8 @@ public class Boat
     {
 	bg.initializeAdult(); //Required for autograder interface. Must be the first thing called.
 	//DO NOT PUT ANYTHING ABOVE THIS LINE.
+
+	/** The logic of an adult is very simple, just sleep on Oahu and wait for waken up. Then he can try to get on the boat and get to Molokai(If failed, just go back sleep). After arriving Molokai, wake a child so that the child will row the boat back to Oahu. */
 
 	conditionLock.acquire();
 	numOfAdultsOnOahu += 1;
@@ -149,14 +156,17 @@ public class Boat
 	bg.initializeChild(); //Required for autograder interface. Must be the first thing called.
 	//DO NOT PUT ANYTHING ABOVE THIS LINE. 
 
+	/** The algorithm of a child is not that easy. First we assume that there are at least two child, and it must be a child that first get on the boat. He will wait for the second child to get on and row both two to Molokai and the rider will come back. The rider is also responsible for caching the number of people on Oahu. If when the boat leave Oahu and no one is still there, we conclude that the task is finished. Actually, this is the tricky part because we may miss somebody. However, the only one that could know for certain that the task is finished is the main thread, which cannot send any kind of signal to the individuals, so the children may act more than they have to and stop at an unexpected time, which will consequent that I can only be sure that a prefix of the result is correct, which is worse that the current solution in my opinion. The rest part is trivial, when a child get to Molokai he can just sleep, and when he is woken up the only thing he needs to do is row back the boat to Oahu, and so on... */
+
 	int cache = 0;
 	int position = Oahu;
-	numOfChildrenOnOahu += 1;
-	while (true){
+	numOfChildrenOnOahu += 1; // number of children on Oahu, cannot be seen when one is on Molokai, but can be cached.
+	while (true){ //recursively run
 	    conditionLock.acquire();
+	    /** strategy of children on Oahu */
 	    if (position == Oahu){
 		while ((boatPosition != Oahu) || (peopleOnBoat > 1)) OahuChildCondition.sleep();
-		if (peopleOnBoat == 0){
+		if (peopleOnBoat == 0){ // he is the first one to get on board
 		    //System.out.println("first child on boat");
 		    peopleOnBoat += 1;
 		    numOfChildrenOnOahu -= 1;
@@ -167,7 +177,7 @@ public class Boat
 		    numOfChildrenOnMolokai += 1;
 		    MolokaiChildCondition.sleep();
 		}
-		else{
+		else{ // he is the second one
 		    boatCondition.wake();
 		    numOfChildrenOnOahu -= 1;
 		    //System.out.println("speak 0 to main");
@@ -218,12 +228,13 @@ public class Boat
 			//s2.V();
 			OahuChildCondition.sleep();
 		    }
-		    else{
+		    else{ // send signal to begin()
 			s1.V();
 			MolokaiChildCondition.sleep();
 		    }
 		}
 	    }
+	    /** strategy of children on Molokai */
 	    else{
 		numOfChildrenOnOahu += 1;
 		numOfChildrenOnMolokai -= 1;

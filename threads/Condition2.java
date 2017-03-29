@@ -11,6 +11,8 @@ import nachos.machine.*;
  *
  * @see	nachos.threads.Condition
  */
+
+/** the implementation is not allowed to include semaphores, so we use locks instead. For the data structures, mainly I referred to the functions in Lock class and do some modifications to fit this environment. The implementation is very much like the implementation of Condition, but there are still several things different: To make the operation atomic, we must disable interrupt from beginning to the end in all functions. And I use waitQueue instead of linkedlist so that in task V the strategy is not like round-robin one. */
 public class Condition2 {
     /**
      * Allocate a new condition variable.

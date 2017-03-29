@@ -29,6 +29,8 @@ public class Alarm {
      * thread to yield, forcing a context switch if there is another thread
      * that should be run.
      */
+
+    /** get the one with smallest waketime and check if it's time to wake up it */
     public void timerInterrupt() {
 
 	Union union;
@@ -86,6 +88,7 @@ public class Alarm {
 	Queue<Union> priorityQueue = new PriorityQueue<Union>(11, OrderIsdn);
 
 	
+    /** enter the wait queue and go to sleep */
 
     public void waitUntil(long x) {
 
