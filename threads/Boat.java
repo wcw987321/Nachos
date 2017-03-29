@@ -11,21 +11,28 @@ public class Boat
     static int numOfAdultsOnOahu = 0;
     static int numOfChildrenOnOahu = 0;
     static int peopleOnBoat = 0;
+    static int m = 0;
     static Lock conditionLock = new Lock();
     static Condition OahuChildCondition = new Condition(conditionLock);
     static Condition OahuAdultCondition = new Condition(conditionLock);
     static Condition MolokaiChildCondition = new Condition(conditionLock);
     static Condition boatCondition = new Condition(conditionLock);
     static Alarm alarm = new Alarm();
+    static Semaphore s1 = new Semaphore(0);
+    static Semaphore s2 = new Semaphore(0);
     
     public static void selfTest()
     {
 	BoatGrader b = new BoatGrader();
 	
 	//System.out.println("\n ***Testing Boats with only 2 children***");
-	//begin(0, 6, b);
+	//begin(16, 16, b);
 
-	//for (int i = 0; i < 7; i++) for (int j = 2; j < 7 - i; j++) {System.out.println(i+" " + j); begin(i, j, b);}
+	//alarm.waitUntil(10000);
+
+	//begin(0, 16, b);
+
+	for (int i = 0; i < 7; i++) for (int j = 2; j < 7; j++) {System.out.println(i+" " + j); begin(i, j, b);}
 
 //	System.out.println("\n ***Testing Boats with 2 children, 1 adult***");
 //  	begin(1, 2, b);
@@ -59,6 +66,7 @@ public class Boat
     numOfAdultsOnOahu = 0;
     numOfChildrenOnOahu = 0;
     peopleOnBoat = 0;
+    m = 0;
 	
 	Communicator com = new Communicator();
 	class Adult implements Runnable{
@@ -90,13 +98,19 @@ public class Boat
 	}
 
 	int sum = adults + children;
-	int m = 0;
 
-	while(m < sum){
+	/*while(m < sum){
 	    //System.out.println("begin to listen");
-	    m += com.listen();
+	    //s1.V();
+	    //System.out.println("release s1");
+	    //s2.P();
+	    //System.out.println("get s2");
+	    //m += com.listen();
+	    //alarm.waitUntil(1000);
 	    //System.out.println("m: " + m);
-	}
+	}*/
+
+	s1.P();
 	//System.out.println("main function finished!");
     }
 
@@ -114,7 +128,12 @@ public class Boat
 	numOfAdultsOnOahu -= 1;
 	boatPosition = Molokai;
 	MolokaiChildCondition.wake();
-	com.speak(1);
+	//com.speak(1);
+	//s1.P();
+	//System.out.println("get s1");
+	//m += 1;
+	//s2.V();
+	//System.out.println("release s2");
 	conditionLock.release();
 
 	/* This is where you should put your solutions. Make calls
@@ -152,32 +171,55 @@ public class Boat
 		    boatCondition.wake();
 		    numOfChildrenOnOahu -= 1;
 		    //System.out.println("speak 0 to main");
-		    com.speak(0);
-		    //System.out.println("speak 0 to main returned");
+		    //com.speak(0);
+		    alarm.waitUntil(1000);
 		    cache = numOfChildrenOnOahu + numOfAdultsOnOahu;
+		    //KThread.currentThread().yield();
+		    //s1.P();
+		    //System.out.println("get s1");
+		    //m += 0;
+		    //s2.V();
+		    //System.out.println("release s2");
+		    //System.out.println("speak 0 to main returned");
 		    bg.ChildRowToMolokai();
 		    //System.out.println("speak 1 to main");
-		    com.speak(1);
+		    //com.speak(1);
+		    //s1.P();
+		    //System.out.println("get s1");
+		    //m += 1;
+		    //s2.V();
+		    //System.out.println("release s2");
 		    //System.out.println("speak 1 to main returned");
 		    bg.ChildRideToMolokai();
 		    OahuChildCondition.wakeAll();
 		    boatPosition = Molokai;
 		    peopleOnBoat = 0;
 		    //System.out.println("speak 1 to main");
-		    com.speak(1);
+		    //com.speak(1);
+		    //s1.P();
+		    //System.out.println("get s1");
+		    //m += 1;
+		    //s2.V();
+		    //System.out.println("release s2");
 		    //System.out.println("speak 1 to main returned");
 		    position = Molokai;
-		    //System.out.println("cache: " + cache);
+		    //cache = numOfChildrenOnOahu + numOfAdultsOnOahu;
+		    System.out.println("cache: " + cache);
 		    if (cache > 0){
 			bg.ChildRowToOahu();
 			position = Oahu;
 			boatPosition = Oahu;
 			numOfChildrenOnOahu += 1;
 			OahuAdultCondition.wake();
-			com.speak(-1);
+			//com.speak(0);
+			//s1.V();
+			//s1.P();
+			//m += -1;
+			//s2.V();
 			OahuChildCondition.sleep();
 		    }
 		    else{
+			s1.V();
 			MolokaiChildCondition.sleep();
 		    }
 		}
@@ -188,7 +230,13 @@ public class Boat
 		position = Oahu;
 		bg.ChildRowToOahu();
 		boatPosition = Oahu;
-		com.speak(-1);
+		//System.out.println("gg");
+		//System.out.println("begin to speak to main");
+		//com.speak(-1);
+		//System.out.println("gg");
+		//s1.P();
+		//m += -1;
+		//s2.V();
 		OahuChildCondition.wakeAll();
 	    }
 	    conditionLock.release();
