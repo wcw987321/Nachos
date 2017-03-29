@@ -539,6 +539,11 @@ public class KThread {
 	new KThread(new CommunicateTest(false, com, 6)).fork();
 	new KThread(new CommunicateTest(true, com, 7)).fork();
 	new CommunicateTest(false, com, 8).run();
+
+	/** test of task VI */
+	alarm.waitUntil(10000);
+	Boat boat = new Boat();
+	boat.selfTest();
     }
 
     private static final char dbgThread = 't';
