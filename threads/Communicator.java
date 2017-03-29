@@ -9,6 +9,9 @@ import nachos.machine.*;
  * be a time when both a speaker and a listener are waiting, because the two
  * threads can be paired off at this point.
  */
+
+	/** It's just a common algorithm, but I need to note that in my algorithm, each time a speaker/listener wake up the listeners/speakers, he must wake all because otherwise there will be more than one pairs at the same time, but we do not have buffer, so an overwrite will be probable to happen. */
+
 public class Communicator {
     /**
      * Allocate a new communicator.
@@ -42,7 +45,7 @@ public class Communicator {
     public void speak(int word) {
 	conditionLock.acquire();
 	//System.out.println("conditionLock acquired by speaker");
-	while ((numOfListener == 0) || (messageWritten)){
+	while ((numOfListener == 0) || (messageWritten)){ // you don't want to overwrite the previous word if it has not been used, and you want someone to listen to you
 	    numOfSpeaker += 1;
 	    //System.out.println("numOfListener: "+numOfListener);
 	    //System.out.println("numOfSpeaker: "+numOfSpeaker);
@@ -58,7 +61,7 @@ public class Communicator {
 	//System.out.println("numOfListener become 0");
 	listenerCondition.wakeAll();
 	//System.out.println("speaker go to sleep");
-	speakerReturnCondition.sleep();
+	speakerReturnCondition.sleep(); //this is to ensure that only when some listener has listened the word that the speaker will return
 	//System.out.println("speaker wake up");
 	//System.out.println("speaker " + word + " returned.");
 	//System.out.println("conditionLock released by speaker");
@@ -74,7 +77,7 @@ public class Communicator {
     public int listen() {
 	conditionLock.acquire();
 	//System.out.println("conditionLock acquired by listener");
-	while (messageWritten == false){
+	while (messageWritten == false){ // when there is no message, just sleep
 	    numOfListener += 1;
 	    //System.out.println("numOfListener: " + numOfListener);
 	    //System.out.println("listener go to sleep");
