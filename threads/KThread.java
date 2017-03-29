@@ -1,6 +1,7 @@
 package nachos.threads;
 
 import nachos.machine.*;
+import java.util.*;
 
 /**
  * A KThread is a thread that can be used to execute Nachos kernel code. Nachos
@@ -402,6 +403,41 @@ public class KThread {
 
 	private int which;
     }
+ 
+    private static class PingTest2 implements Runnable  
+    {  
+        Lock a=null,b=null;  
+        int name;  
+        PingTest2(Lock A,Lock B,int x)  
+        {  
+            a=A;b=B;name=x;  
+        }  
+        public void run() {  
+            System.out.println("Thread "+name+" starts.");  
+            if(b!=null)  
+            {  
+                System.out.println("Thread "+name+" waits for Lock b.");  
+                b.acquire();  
+                System.out.println("Thread "+name+" gets Lock b.");  
+            }  
+            if(a!=null)  
+            {  
+                System.out.println("Thread "+name+" waits for Lock a.");  
+                a.acquire();  
+                System.out.println("Thread "+name+" gets Lock a.");  
+            }  
+            KThread.yield();  
+            boolean intStatus = Machine.interrupt().disable();  
+            System.out.println("Thread "+name+" has priority "+ThreadedKernel.scheduler.getEffectivePriority()+".");  
+            Machine.interrupt().restore(intStatus);  
+            KThread.yield();  
+            if(b!=null) b.release();  
+            if(a!=null) a.release();  
+            System.out.println("Thread "+name+" finishs.");  
+              
+        }  
+    }  
+
 
     private static class CommunicateTest implements Runnable {
 	CommunicateTest(boolean flag, Communicator com, int word) {
@@ -539,6 +575,43 @@ public class KThread {
 	new KThread(new CommunicateTest(false, com, 6)).fork();
 	new KThread(new CommunicateTest(true, com, 7)).fork();
 	new CommunicateTest(false, com, 8).run();
+
+	/** test of task V */
+
+	alarm.waitUntil(10000);
+	Lock a=new Lock();  
+        Lock b=new Lock();  
+          
+        Queue<KThread> qq=new LinkedList<KThread>();  
+        for(int i=1;i<=5;i++)  
+        {  
+            KThread kk=new KThread(new PingTest2(null,null,i));  
+            qq.add(kk);  
+            kk.setName("Thread-"+i).fork();  
+        }  
+        for(int i=6;i<=10;i++)  
+        {  
+            KThread kk=new KThread(new PingTest2(a,null,i));  
+            qq.add(kk);  
+            kk.setName("Thread-"+i).fork();  
+        }  
+        for(int i=11;i<=15;i++)  
+        {  
+            KThread kk=new KThread(new PingTest2(a,b,i));  
+            qq.add(kk);  
+            kk.setName("Thread-"+i).fork();  
+        }  
+        KThread.yield();  
+        Iterator it=qq.iterator();  
+        int pp=0;  
+        while(it.hasNext())  
+        {  
+            boolean intStatus = Machine.interrupt().disable();  
+            ThreadedKernel.scheduler.setPriority((KThread)it.next(),pp+1);  
+            Machine.interrupt().restore(intStatus);  
+            pp++;
+            if(pp>6)pp-=6;
+        }  
 
 	/** test of task VI */
 	alarm.waitUntil(10000);
