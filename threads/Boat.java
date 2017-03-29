@@ -204,7 +204,7 @@ public class Boat
 		    //System.out.println("speak 1 to main returned");
 		    position = Molokai;
 		    //cache = numOfChildrenOnOahu + numOfAdultsOnOahu;
-		    System.out.println("cache: " + cache);
+		    //System.out.println("cache: " + cache);
 		    if (cache > 0){
 			bg.ChildRowToOahu();
 			position = Oahu;
