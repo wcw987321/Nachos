@@ -44,19 +44,25 @@ public class Communicator {
 	//System.out.println("conditionLock acquired by speaker");
 	while ((numOfListener == 0) || (messageWritten)){
 	    numOfSpeaker += 1;
-	    //System.out.println(numOfListener);
+	    //System.out.println("numOfListener: "+numOfListener);
+	    //System.out.println("numOfSpeaker: "+numOfSpeaker);
+	    //System.out.println("speaker go to sleep");
 	    speakerCondition.sleep();
+	    //System.out.println("speaker wake up");
 	}
 	//System.out.println(numOfListener);
 	message = word;
 	//System.out.println("written " + word);
 	messageWritten = true;
 	numOfListener = 0;
+	//System.out.println("numOfListener become 0");
 	listenerCondition.wakeAll();
+	//System.out.println("speaker go to sleep");
 	speakerReturnCondition.sleep();
+	//System.out.println("speaker wake up");
 	//System.out.println("speaker " + word + " returned.");
-	conditionLock.release();
 	//System.out.println("conditionLock released by speaker");
+	conditionLock.release();
     }
 
     /**
@@ -70,7 +76,9 @@ public class Communicator {
 	//System.out.println("conditionLock acquired by listener");
 	while (messageWritten == false){
 	    numOfListener += 1;
-	    //System.out.println("numOfListener += 1");
+	    //System.out.println("numOfListener: " + numOfListener);
+	    //System.out.println("listener go to sleep");
+	    speakerCondition.wakeAll();
 	    listenerCondition.sleep();
 	    //System.out.println("listener wake up");
 	}
@@ -81,8 +89,8 @@ public class Communicator {
 	speakerCondition.wakeAll();
 	speakerReturnCondition.wake();
 	//System.out.println("listener " + word + " returned.");
-	conditionLock.release();
 	//System.out.println("conditionLock released by listener");
+	conditionLock.release();
 	return word;
     }
 }

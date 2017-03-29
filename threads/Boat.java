@@ -22,10 +22,10 @@ public class Boat
     {
 	BoatGrader b = new BoatGrader();
 	
-	System.out.println("\n ***Testing Boats with only 2 children***");
-	begin(3, 5, b);
+	//System.out.println("\n ***Testing Boats with only 2 children***");
+	//begin(0, 6, b);
 
-	//for (int i = 0; i < 17; i++) for (int j = 2; j < 17; j++) {System.out.println(i+" " + j); begin(i, j, b);}
+	//for (int i = 0; i < 7; i++) for (int j = 2; j < 7 - i; j++) {System.out.println(i+" " + j); begin(i, j, b);}
 
 //	System.out.println("\n ***Testing Boats with 2 children, 1 adult***");
 //  	begin(1, 2, b);
@@ -93,6 +93,7 @@ public class Boat
 	int m = 0;
 
 	while(m < sum){
+	    //System.out.println("begin to listen");
 	    m += com.listen();
 	    //System.out.println("m: " + m);
 	}
@@ -150,7 +151,9 @@ public class Boat
 		else{
 		    boatCondition.wake();
 		    numOfChildrenOnOahu -= 1;
+		    //System.out.println("speak 0 to main");
 		    com.speak(0);
+		    //System.out.println("speak 0 to main returned");
 		    cache = numOfChildrenOnOahu + numOfAdultsOnOahu;
 		    bg.ChildRowToMolokai();
 		    //System.out.println("speak 1 to main");

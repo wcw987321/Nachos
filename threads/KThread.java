@@ -411,8 +411,8 @@ public class KThread {
 	}
 
 	public void run() {
-	    if (flag) com.speak(word);
-	    else System.out.println(com.listen());
+	    if (flag) {for (int i = 0; i < 10; i++) com.speak(word);}
+	    else {for (int i = 0; i < 10; i++) System.out.println(com.listen());}
 	}
 
 	private boolean flag;
