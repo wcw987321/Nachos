@@ -8,6 +8,18 @@ import java.util.Iterator;
 import java.util.LinkedList; //
 
 /**
+ * Project 1 Task 5
+ * 2017.3.29
+ *
+ * If we regard thread A as thread B's father when A holds some resource B needs
+ * directly, then they consist of a tree, so we use holdThread to represent the
+ * parent, waitThreads to represent the children, waitQueue to represent the
+ * ancestors, and holdQueues to represent the descendants. Also, there are only
+ * constant possible value of priority, so waitThreads[i] represents the children
+ * whose priority is i, and we use TreeSet to store them. 
+ */
+
+/**
  * A scheduler that chooses threads based on their priorities.
  *
  * <p>
