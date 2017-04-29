@@ -198,7 +198,7 @@ public class UserProcess {
      */
     private boolean load(String name, String[] args) {
 	Lib.debug(dbgProcess, "UserProcess.load(\"" + name + "\")");
-	
+
 	OpenFile executable = ThreadedKernel.fileSystem.open(name, false);
 	if (executable == null) {
 	    Lib.debug(dbgProcess, "\topen failed");
