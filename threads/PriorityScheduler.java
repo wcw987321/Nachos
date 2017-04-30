@@ -379,7 +379,7 @@ public class PriorityScheduler extends Scheduler {
 		Lib.assertTrue(waitQueue.isEmpty());
 	}	
 
-	/** The thread with which this object is associated. */	   
+	/** The thread with which this object is associated. */
 	protected KThread thread;
 	/** The priority of the associated thread. */
 	protected int priority/**/, effectivePriority;
