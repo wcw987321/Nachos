@@ -120,7 +120,8 @@ public class PriorityScheduler extends Scheduler {
     /**
      * The maximum priority that a thread can have. Do not change this value.
      */
-    public static final int priorityMaximum = 7;    
+    //public static final int priorityMaximum = 7;
+	public static final int priorityMaximum = Integer.MAX_VALUE;
 
     /**
      * Return the scheduling state of the specified thread.
@@ -378,7 +379,7 @@ public class PriorityScheduler extends Scheduler {
 		Lib.assertTrue(waitQueue.isEmpty());
 	}	
 
-	/** The thread with which this object is associated. */	   
+	/** The thread with which this object is associated. */
 	protected KThread thread;
 	/** The priority of the associated thread. */
 	protected int priority/**/, effectivePriority;
