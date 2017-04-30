@@ -674,7 +674,7 @@ public class UserProcess {
 			return -1;
 		}
 
-		for (int i = 0; i > childProcesses.size(); i++)
+		for (int i = 0; i < childProcesses.size(); i++)
 		{
 			if (childProcesses.get(i) == childPid) {childProcesses.remove(i); break;}
 		}
