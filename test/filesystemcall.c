@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
     }
     else {
         LOG("++FILESYSCALL Run all the variations\n");
-        for (i=5; i <= NUMVARS; i++) {
+        for (i=0; i <= NUMVARS; i++) {
 	    //if (i == 3) continue;
             LOG("++FILESYSCALL Run the %dth variations\n", i);
             route(i, dbg_flag);
@@ -181,6 +181,7 @@ void route(int variation, char dbg_flag)
                         TESTFILE2);
                 exit(-1);
             }
+	    close(fd);
 
             LOG("++FILESYSCALL VAR1: SUCCESS\n");
              
@@ -242,10 +243,10 @@ void route(int variation, char dbg_flag)
             LOG("++FILESYSCALL VAR3: [STARTED]\n");
             LOG("++FILESYSCALL VAR3: tests if your syscall open fails gracefully when stubFileSystem's openfile limit's exceeded\n");
             LOG("++FILESYSCALL VAR3: will open %d files\n", MAXOPENFILES);
-	    retval = creat("out");
             for (i = 0; i <= MAXOPENFILES; i++) {
                 LOG("++FILESYSCALL VAR3: opening the %dth file\n", i);
                 fds[i] = open("out"); 
+		printf("fds[%d]: %d\n", i, fds[i]);
                 if (fds[i] == -1) {
                     LOG("++FILESYSCALL VAR3: failed to open file \"out\" \n"); 
                     exit(-1);
