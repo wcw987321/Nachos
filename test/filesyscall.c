@@ -58,6 +58,7 @@ else printf("Test 2 failed\n\n");
 
 /* Test 3 */
 
+if(false){
 printf("Test 3 started\n");
 printf("Tests if your syscall open fails gracefully when stubFileSystem's openfile limit's exceeded\n");
 flag = true;
@@ -78,21 +79,39 @@ if(fds[13] != -1) flag = false;
 for (i = 0; i < 14; i++) close(fds[i]);
 if (flag) printf("Test 3 succeed\n\n");
 else printf("Test 3 failed\n\n");
+}
 
 /* Test 4 */
 
 printf("Test 4 started\n");
-printf("Tests if all files get closed when process exits normally\n");
+printf("Tests copy\n");
 flag = true;
-fd = creat("4.txt");
-if (fd == -1) flag = false;
-ret = open("4.txt");
-if (ret == -1) flag = false;
-/*xuyaoyongdao exec, daihuizaishuo~*/
+fd = open("cp.in");
+ret = open("cp.out");
+char buf[100];
+int amount;
+while ((amount = read(fd, buf, 100))>0) {
+    write(ret, buf, amount);
+}
+close(fd);
+close(ret);
 if (flag) printf("Test 4 succeed\n\n");
 else printf("Test 4 failed\n\n");
 
-/* Test 5 */
+/* Task 5 */
 
+printf("Test 5 started\n");
+printf("Tests move\n");
+flag = true;
+fd = open("cp.in");
+ret = open("cp.out");
+while ((amount = read(fd, buf, 100))>0) {
+    write(ret, buf, amount);
+}
+unlink("cp.in");
+close(fd);
+close(ret);
+if (flag) printf("Test 5 succeed\n\n");
+else printf("Test 5 failed\n\n");
 
 }

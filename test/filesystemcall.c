@@ -92,7 +92,8 @@ int main(int argc, char *argv[]) {
     }
     else {
         LOG("++FILESYSCALL Run all the variations\n");
-        for (i=0; i <= NUMVARS; i++) {
+        for (i=5; i <= NUMVARS; i++) {
+	    //if (i == 3) continue;
             LOG("++FILESYSCALL Run the %dth variations\n", i);
             route(i, dbg_flag);
         }
@@ -260,7 +261,7 @@ void route(int variation, char dbg_flag)
             break;
               
 
-        case 4:if (false){
+        case 4:
             /***************************************************************/
             /*                                                             */
             /* Variation 4:                                                */ 
@@ -284,7 +285,7 @@ void route(int variation, char dbg_flag)
             
             LOG("++FILESYSCALL VAR4: SUCCESS\n");
             
-            break;}
+            break;
 
         case 5:
             /***************************************************************/
@@ -374,6 +375,8 @@ void route(int variation, char dbg_flag)
             LOG("++FILESYSCALL VAR7: [STARTED]\n");
             LOG("++FILESYSCALL VAR7: copies between files, tests creat, open, read, write, close\n");
             LOG("++FILESYSCALL VAR7: invoke syscall exec cp.coff\n");
+	    fds[0] = creat(VAR7OUT);
+	    fds[1] = creat(VAR7IN);
             executable = "cp.coff";
             _argv[0] = executable;
             _argv[1] = VAR7IN;
@@ -381,6 +384,7 @@ void route(int variation, char dbg_flag)
             _argc = 3;
             pid = exec(executable, _argc, _argv);
             if (pid <= 0) {
+		LOG("%d\n", pid);
                 LOG("++FILESYSCALL VAR7: failed to exec %s \n", executable); 
                 exit(-1);
             }
@@ -394,7 +398,7 @@ void route(int variation, char dbg_flag)
             p = buf;
             cnt = 0;
 
-            LOG("++FILESYSCALL VAR7: open %s \n", VAR7OUT); 
+            LOG("++FILESYSCALL VAR7: open %s \n", VAR7OUT);
             fds[0] = open(VAR7OUT);
             if (fds[0] == -1) {
                 LOG("++FILESYSCALL VAR7: failed to open %s \n", VAR7OUT); 
@@ -408,7 +412,7 @@ void route(int variation, char dbg_flag)
             }
             buf[cnt] = '\0';
 
-            LOG("++FILESYSCALL VAR7: open %s \n", VAR7IN); 
+            LOG("++FILESYSCALL VAR7: open %s \n", VAR7IN);
             fds[1] = open(VAR7IN);
             if (fds[1] == -1) {
                 LOG("++FILESYSCALL VAR7: failed to open %s \n", VAR7IN); 
