@@ -141,8 +141,9 @@ public class PriorityScheduler extends Scheduler {
     protected class PriorityQueue extends ThreadQueue {
 	PriorityQueue(boolean transferPriority) {
 	    this.transferPriority = transferPriority;
-		for(int i = priorityMinimum;i <= priorityMaximum;i++)
-			waitThreads[i] = new TreeSet<ThreadState>(); //
+		/*for(int i = priorityMinimum;i <= priorityMaximum;i++)
+			waitThreads[i] = new TreeSet<ThreadState>(); */
+		waitThreadsSet = new TreeSet<>();
 	}
 	
 	public void waitForAccess(KThread thread) {
@@ -177,9 +178,11 @@ public class PriorityScheduler extends Scheduler {
 	
 	protected ThreadState NextThread() { //
 		ThreadState res=null;
-		for(int i=priorityMaximum;i>=priorityMinimum;i--)
+		/*for(int i=priorityMaximum;i>=priorityMinimum;i--)
 			if((res=waitThreads[i].pollFirst())!=null)
-				break;
+				break;*/
+
+		res = waitThreadsSet.pollLast();
 		return res;
 	}
 	
@@ -203,14 +206,16 @@ public class PriorityScheduler extends Scheduler {
 	}
 
 	public void add(ThreadState thread) { //
-		waitThreads[thread.effectivePriority].add(thread);
+		//waitThreads[thread.effectivePriority].add(thread);
+		waitThreadsSet.add(thread);
 	}
 	
 	public boolean isEmpty() { //
-		for(int i = priorityMinimum;i <= priorityMaximum;i++)
+		return waitThreadsSet.isEmpty();
+		/*for(int i = priorityMinimum;i <= priorityMaximum;i++)
 			if(!waitThreads[i].isEmpty())
 				return false;
-		return true;
+		return true;*/
 	}
 	
 	/**
@@ -219,7 +224,8 @@ public class PriorityScheduler extends Scheduler {
 	 */
 	protected long cnt = 0; //
 	public boolean transferPriority;
-	protected TreeSet<ThreadState> waitThreads[] = new TreeSet[priorityMaximum+1]; //
+	//protected TreeSet<ThreadState> waitThreads[] = new TreeSet[priorityMaximum+1];
+	protected TreeSet<ThreadState> waitThreadsSet = new TreeSet<>();
 	protected ThreadState holdThread = null; //
 	
     }
@@ -244,13 +250,27 @@ public class PriorityScheduler extends Scheduler {
 	    getEffectivePriority(); //
 	}
 	
-	public int compareTo(ThreadState target) { //
+	/*public int compareTo(ThreadState target) { //
 		if(time > target.time)
 			return 1;
 		else if(time == target.time)
 			return 0;
 		else
 			return -1;
+	}*/
+
+	public int compareTo(ThreadState target) {
+		if (this.effectivePriority > target.effectivePriority)
+			return 1;
+		else if (this.effectivePriority < target.effectivePriority)
+			return -1;
+		else {
+			if (this.time > target.time)
+				return 1;
+			if (this.time < target.time)
+				return -1;
+			return 0;
+		}
 	}
 
 	/**
@@ -276,18 +296,24 @@ public class PriorityScheduler extends Scheduler {
 			while(iterator.hasNext())
 			{
 				PriorityQueue holdQueue = (PriorityQueue)iterator.next();
-				for(i = priorityMaximum;i > temp;i--)
-					if(!holdQueue.waitThreads[i].isEmpty())
-					{
+				/*for(i = priorityMaximum;i > temp;i--) {
+					if (!holdQueue.waitThreads[i].isEmpty()) {
 						temp = i;
 						break;
 					}
+				}*/
+				int maxPriority = holdQueue.waitThreadsSet.last().effectivePriority;
+				if (maxPriority > temp)
+					temp = maxPriority;
 			}
 		}
 		if(waitQueue!=null&&temp!=effectivePriority)
 		{
-			((PriorityQueue)waitQueue).waitThreads[effectivePriority].remove(this);
-			((PriorityQueue)waitQueue).waitThreads[temp].add(this);
+			//((PriorityQueue)waitQueue).waitThreads[effectivePriority].remove(this);
+			//((PriorityQueue)waitQueue).waitThreads[temp].add(this);
+			((PriorityQueue) waitQueue).waitThreadsSet.remove(this);
+			this.effectivePriority = temp;
+			((PriorityQueue) waitQueue).waitThreadsSet.add(this);
 		}
 		if(holdThread!=null)
 			holdThread.getEffectivePriority();
