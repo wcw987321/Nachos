@@ -681,7 +681,7 @@ public class UserProcess {
 		if (filename == null)
 			return -1;
 
-		String suffix = filename.substring(filename.length() - 4, filename.length());
+		String suffix = filename.substring(filename.length() - 5, filename.length());
 		if (suffix.equals(".coff") == false)
 			return -1;
 
