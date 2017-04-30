@@ -554,7 +554,7 @@ public class UserProcess {
 	 * source is vaddr
 	 */
 	private int handleWrite(int index, int vaddr, int bufferSize) {
-		if (index < 0 || index > MAXFD)
+		if (index < 0 || index > MAXFD || bufferSize < 0)
 			return -1;
 
 		SimpleFileDescriptor fd = simpleFileDescriptors[index];
@@ -581,7 +581,8 @@ public class UserProcess {
 			return -1;
 
 		SimpleFileDescriptor fd = simpleFileDescriptors[a0];
-		fd.file.close();
+		if (fd.file == null)
+			fd.file.close();
 		fd.file = null;
 
 		boolean returnValue = true;
@@ -611,8 +612,7 @@ public class UserProcess {
 			returnValue = UserKernel.fileSystem.remove(filename);
 		}
 		else {
-			handleClose(a0);
-			returnValue = UserKernel.fileSystem.remove(filename);
+			simpleFileDescriptors[index].toRemove = true;
 		}
 
 		if (returnValue == false)
@@ -764,7 +764,7 @@ public class UserProcess {
 			return handleUnlink(a0);
 		case syscallExit:
 			handleExit(a0);
-			break;
+			return 0;
 		case syscallJoin:
 			return handleJoin(a0, a1);
 		case syscallExec:
