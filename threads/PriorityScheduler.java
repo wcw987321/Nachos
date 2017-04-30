@@ -302,7 +302,9 @@ public class PriorityScheduler extends Scheduler {
 						break;
 					}
 				}*/
-				int maxPriority = holdQueue.waitThreadsSet.last().effectivePriority;
+				int maxPriority = 0;
+				if (holdQueue.waitThreadsSet.isEmpty() == false)
+					maxPriority = holdQueue.waitThreadsSet.last().effectivePriority;
 				if (maxPriority > temp)
 					temp = maxPriority;
 			}
