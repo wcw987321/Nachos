@@ -547,7 +547,7 @@ public class UserProcess {
 	 * write to vaddr
 	 */
 	private int handleRead(int index, int vaddr, int bufferSize) {
-		if  (index < 0 || index > MAXFD)
+		if  (index < 0 || index >= MAXFD || bufferSize < 0)
 			return -1;
 		if (vaddr < 0) return -1;
 
@@ -572,7 +572,7 @@ public class UserProcess {
 	 * source is vaddr
 	 */
 	private int handleWrite(int index, int vaddr, int bufferSize) {
-		if (index < 0 || index > MAXFD || bufferSize < 0)
+		if (index < 0 || index >= MAXFD || bufferSize < 0)
 			return -1;
 
 		SimpleFileDescriptor fd = simpleFileDescriptors[index];
