@@ -480,7 +480,7 @@ public class KThread {
      * Tests whether this module is working.
      */
     public static void selfTest() {
-
+	
 	/** original test */
 
 	Lib.debug(dbgThread, "Enter KThread.selfTest");
