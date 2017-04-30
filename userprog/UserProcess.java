@@ -581,7 +581,7 @@ public class UserProcess {
 			return -1;
 
 		SimpleFileDescriptor fd = simpleFileDescriptors[a0];
-		if (fd.file == null)
+		if (fd.file != null)
 			fd.file.close();
 		fd.file = null;
 
@@ -612,7 +612,8 @@ public class UserProcess {
 			returnValue = UserKernel.fileSystem.remove(filename);
 		}
 		else {
-			simpleFileDescriptors[index].toRemove = true;
+			handleClose(a0);
+			returnValue = UserKernel.fileSystem.remove(filename);
 		}
 
 		if (returnValue == false)
