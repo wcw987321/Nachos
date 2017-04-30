@@ -4,10 +4,14 @@ import nachos.machine.*;
 import nachos.threads.*;
 import nachos.userprog.*;
 
+import java.util.LinkedList;
+
 /**
  * A kernel that can support multiple user processes.
  */
 public class UserKernel extends ThreadedKernel {
+	private static LinkedList<Integer> freePages = new LinkedList<Integer>();
+
     /**
      * Allocate a new user kernel.
      */
@@ -20,13 +24,18 @@ public class UserKernel extends ThreadedKernel {
      * processor's exception handler.
      */
     public void initialize(String[] args) {
-	super.initialize(args);
+		super.initialize(args);
 
-	console = new SynchConsole(Machine.console());
-	
-	Machine.processor().setExceptionHandler(new Runnable() {
-		public void run() { exceptionHandler(); }
-	    });
+		console = new SynchConsole(Machine.console());
+
+		int numPhysPages = Machine.processor().getNumPhysPages();
+		for (int i = 0; i < numPhysPages; ++i) {
+			freePages.add(i);
+		}
+
+		Machine.processor().setExceptionHandler(new Runnable() {
+			public void run() { exceptionHandler(); }
+			});
     }
 
     /**
@@ -48,6 +57,22 @@ public class UserKernel extends ThreadedKernel {
 
 	System.out.println("");
     }
+
+    public static int getFreePage() {
+    	int pageNumber = -1;
+    	boolean interruptStatus = Machine.interrupt().disable();
+    	if (freePages.isEmpty() == false) {
+    		pageNumber = freePages.removeFirst();
+		}
+		Machine.interrupt().restore(interruptStatus);
+		return pageNumber;
+	}
+
+	public static void addFreePage(int pageNumber) {
+    	boolean interruptStatus = Machine.interrupt().disable();
+    	freePages.addFirst(pageNumber);
+    	Machine.interrupt().restore(interruptStatus);
+	}
 
     /**
      * Returns the current process.
