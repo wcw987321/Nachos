@@ -154,7 +154,7 @@ public class LotteryScheduler extends PriorityScheduler {
                 ((PriorityQueue) waitQueue).waitThreadsSet.add(this);
             }
             if(holdThread!=null)
-                holdThread.getEffectivePriority();
+                ((LotteryThreadState)holdThread).getEffectivePriority();
             return (effectivePriority=temp);
             //return priority;
         }
