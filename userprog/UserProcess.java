@@ -532,6 +532,7 @@ public class UserProcess {
 	private int handleRead(int index, int vaddr, int bufferSize) {
 		if  (index < 0 || index > MAXFD)
 			return -1;
+		if (vaddr < 0) return -1;
 
 		SimpleFileDescriptor fd = simpleFileDescriptors[index];
 		if (fd.file == null)
