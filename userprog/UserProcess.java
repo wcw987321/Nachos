@@ -180,6 +180,10 @@ public class UserProcess {
 		int amount = Math.min(length, memory.length-vaddr);
 		System.arraycopy(memory, vaddr, data, offset, amount);*/
 
+		if (vpn >= numPages) {
+			return -1;
+		}
+
 		TranslationEntry entry = pageTable[vpn];
 		if (entry == null)
 			return 0;
@@ -187,6 +191,11 @@ public class UserProcess {
 			return -1;
 
 		entry.used = true;
+
+		if (entry.ppn < 0 || entry.ppn >= Machine.processor().getNumPhysPages()) {
+			return 0;
+		}
+
 		int paddr = entry.ppn * pageSize + addrOffset;
 		int amount = Math.min(length, memory.length - paddr);
 		System.arraycopy(memory, paddr, data, offset, amount);
@@ -236,6 +245,10 @@ public class UserProcess {
 		int amount = Math.min(length, memory.length-vaddr);
 		System.arraycopy(data, offset, memory, vaddr, amount);*/
 
+		if (vpn >= numPages) {
+			return -1;
+		}
+
 		TranslationEntry entry = pageTable[vpn];
 
 		if (entry == null)
@@ -245,6 +258,10 @@ public class UserProcess {
 
 		entry.used = true;
 		entry.dirty = true;
+
+		if (entry.ppn < 0 || entry.ppn >= Machine.processor().getNumPhysPages()) {
+			return 0;
+		}
 
 		int paddr = entry.ppn * pageSize + addrOffset;
 		int amount = Math.min(length, memory.length - paddr);
@@ -681,7 +698,7 @@ public class UserProcess {
 	 * Handle the exec(..) system call
 	 */
 	private int handleExec(int fileAddr, int argCount, int argAddr) {
-		if (argCount < 0)
+		if (argCount < 1)
 			return -1;
 		String filename = readVirtualMemoryString(fileAddr, MAXSTRLEN);
 		if (filename == null)
