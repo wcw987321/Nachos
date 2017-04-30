@@ -543,7 +543,7 @@ public class UserProcess {
 		if (readSize <= 0)
 			return 0;
 
-		int writeSize = writeVirtualMemory(vaddr, buffer);
+		int writeSize = writeVirtualMemory(vaddr, buffer, 0, readSize);
 		return writeSize;
 	}
 
