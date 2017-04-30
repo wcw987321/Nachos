@@ -34,7 +34,7 @@ public class UserProcess {
 	private LinkedList<Integer> childProcesses = new LinkedList<>();
 	private UThread thread;
 
-	private static final int MAXSTRLEN = 255;
+	private static final int MAXSTRLEN = 256;
 	private static final int MAXFD = 16;
 	private static final int STDIN = 0;
 	private static final int STDOUT = 1;
