@@ -680,7 +680,7 @@ public class UserProcess {
 	 * Handle the exec(..) system call
 	 */
 	private int handleExec(int fileAddr, int argCount, int argAddr) {
-		if (argCount < 0)
+		if (argCount < 1)
 			return -1;
 		String filename = readVirtualMemoryString(fileAddr, MAXSTRLEN);
 		if (filename == null)
