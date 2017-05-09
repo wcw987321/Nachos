@@ -177,6 +177,7 @@ public class LotteryScheduler extends Scheduler {
         protected ThreadState NextThread() { //
 
             int sum = 0;
+	    if (waitThreadsSet.isEmpty()) return null;
             for (ThreadState threadState : waitThreadsSet) {
                 sum += threadState.getEffectivePriority();
             }
