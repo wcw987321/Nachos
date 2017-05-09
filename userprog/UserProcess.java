@@ -681,7 +681,7 @@ public class UserProcess {
 		//childProcesses.remove(childPid);
 		UserProcess childProcess = UserProcess.findProcessByID(childPid);
 		if (childProcess == null) {
-			return -2;
+			return 0;
 		}
 
 		childProcess.thread.join();
@@ -689,9 +689,9 @@ public class UserProcess {
 		byteStatus = Lib.bytesFromInt(childProcess.exitStatus);
 		int transferSize = writeVirtualMemory(addrStatus, byteStatus);
 		if (transferSize == 4) {
-			return 0;
+			return 1;
 		}
-		return 1;
+		return 0;
 	}
 
 	/**
