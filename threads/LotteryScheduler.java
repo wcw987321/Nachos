@@ -113,7 +113,7 @@ public class LotteryScheduler extends Scheduler {
     /**
      * The minimum priority that a thread can have. Do not change this value.
      */
-    public static final int priorityMinimum = 0;
+    public static final int priorityMinimum = 1;
     /**
      * The maximum priority that a thread can have. Do not change this value.
      */
